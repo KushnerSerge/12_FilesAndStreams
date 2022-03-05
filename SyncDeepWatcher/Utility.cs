@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SyncDeep
+namespace SyncDeepWatcher
 {
+
     class FileCompare : System.Collections.Generic.IEqualityComparer<System.IO.FileInfo>
     {
         public FileCompare() { }
@@ -32,8 +33,8 @@ namespace SyncDeep
     {
         public static void DeleteFoldersFromDir2WhichIsNotInDir1()
         {
-            string pathA = @"C:\Users\kusni\source\repos\12_FilesAndStreams\SyncDeep\Dir_1";
-            string pathB = @"C:\Users\kusni\source\repos\12_FilesAndStreams\SyncDeep\Dir_2";
+            string pathA = @"C:\Users\kusni\source\repos\12_FilesAndStreams\SyncDeepWatcher\Dir_1";
+            string pathB = @"C:\Users\kusni\source\repos\12_FilesAndStreams\SyncDeepWatcher\Dir_2";
 
             string[] dirs_1 = Directory.GetDirectories(pathA, "*", SearchOption.AllDirectories);
             string[] dirs_2 = Directory.GetDirectories(pathB, "*", SearchOption.AllDirectories);
@@ -50,25 +51,28 @@ namespace SyncDeep
 
             while (resultToDelete.Count() > 0)
             {
-                for(int i = 0; i<resultToDelete.Count; i++)
+
+                for (int i = 0; i < resultToDelete.Count; i++)
                 {
-                    string[] files = Directory.GetFiles(resultToDelete[i]);
-                    foreach (var file in files)
+                    if (Directory.Exists(resultToDelete[i]))
                     {
-                        System.IO.File.Delete(file);
+                        string[] files = Directory.GetFiles(resultToDelete[i]);
+                        foreach (var file in files)
+                        {
+                            System.IO.File.Delete(file);
+                        }
+                        if (IsDirectoryEmpty(resultToDelete[i]))
+                        {
+                            Directory.Delete(resultToDelete[i]);
+                            resultToDelete.Remove(resultToDelete[i]);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Dir is not empty");
+                        }
                     }
-                    if (IsDirectoryEmpty(resultToDelete[i]))
-                    {
-                        Directory.Delete(resultToDelete[i]);
-                        resultToDelete.Remove(resultToDelete[i]);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Dir is not empty");
-                    }
-
-
                 }
+
             }
 
             Console.WriteLine("-----BBBBB----------");
@@ -77,7 +81,7 @@ namespace SyncDeep
 
         public static void CreateFoldersFromDir1ToDir2()
         {
-            string pathA = @"C:\Users\kusni\source\repos\12_FilesAndStreams\SyncDeep\Dir_1";
+            string pathA = @"C:\Users\kusni\source\repos\12_FilesAndStreams\SyncDeepWatcher\Dir_1";
             //           string pathB = @"C:\Users\kusni\source\repos\12_FilesAndStreams\SyncDeep\Dir_2";
 
             string[] dirs_1 = Directory.GetDirectories(pathA, "*", SearchOption.AllDirectories);
@@ -98,7 +102,7 @@ namespace SyncDeep
             Console.WriteLine("-----BBBBB----------");
 
         }
-        static bool IsDirectoryEmpty(string path)
+        public static bool IsDirectoryEmpty(string path)
         {
             return !Directory.EnumerateFileSystemEntries(path).Any();
         }
